@@ -1,0 +1,27 @@
+{
+  "items": [
+    {
+      "productName": "Mercedez",
+      "quantity": 5,
+      "supplier": "Bbbr",
+      "imagePath": "F:\\OnlineCourses\\MvcPyside6\\CodeLive\\PracticeProjects\\Project_03_Inventory\\data\\images\\20250624112014_stingy_crying.jpg",
+      "rating": 5,
+      "description": "Imodoka\n",
+      "lastUpdated": "2025-06-24T11:20:14"
+    },
+    {
+      "productName": "Igare",
+      "quantity": 5,
+      "supplier": "Cccr",
+      "imagePath": "C:/Users/Daniel/Downloads/option_b.jpg",
+      "rating": 4,
+      "description": "Igare",
+      "lastUpdated": "2025-06-24T11:16:53"
+    }
+  ],
+  "suppliers": [
+    "Aaar",
+    "Bbbr",
+    "Cccr"
+  ]
+}
