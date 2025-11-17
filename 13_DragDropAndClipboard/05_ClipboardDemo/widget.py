@@ -49,6 +49,8 @@ class Widget(QWidget):
         clipboard = QApplication.clipboard()
         mime_data = clipboard.mimeData()
         
+        pixmap = None
+        
         # Check if the clipboard contains URLs (e.g., files)
         if mime_data.hasUrls():
             urls = mime_data.urls()
@@ -61,22 +63,18 @@ class Widget(QWidget):
             # Check if it's an image and display it
             if self.isImage(file_path):
                 pixmap = QPixmap(file_path)
-                if not pixmap.isNull():
-                    # Scale the pixmap to fit the label while maintaining aspect ratio
-                    self.ui.label.setPixmap(pixmap.scaled(
-                        self.ui.label.size(),
-                        Qt.KeepAspectRatio,
-                        Qt.SmoothTransformation
-                    ))
         # Also check for image data directly
         elif mime_data.hasImage():
             pixmap = QPixmap(mime_data.imageData())
-            if not pixmap.isNull():
-                self.ui.label.setPixmap(pixmap.scaled(
-                    self.ui.label.size(),
-                    Qt.KeepAspectRatio,
-                    Qt.SmoothTransformation
-                ))
+        
+        # If we got a valid pixmap, store it and display it
+        if pixmap and not pixmap.isNull():
+            self.original_pixmap = pixmap
+            self.ui.label.setPixmap(pixmap.scaled(
+                self.ui.label.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            ))
     
     def resizeEvent(self, event):
         """Handle resize events to scale the image"""
