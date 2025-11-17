@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QApplication
 from PySide6.QtCore import Qt, QPoint, QByteArray, QIODevice, QDataStream, QBuffer, QMimeData
 from PySide6.QtGui import (QPainter, QMouseEvent, QDragEnterEvent, QDragMoveEvent, 
                           QDragLeaveEvent, QDropEvent, QPixmap, QDrag, QColor, QImage)
-import resource_rc  # Import the resource file
+import resources_rc  # Import the resource file
 
 class Container(QWidget):
     """Container widget that supports internal drag and drop operations"""
@@ -105,8 +105,9 @@ class Container(QWidget):
                 pixmap.save(buffer, "PNG")
                 buffer.close()
                 
-                # Calculate hotspot offset
+                # Calculate hotspot offset (cursor position relative to widget's top-left)
                 hotspot = event.position().toPoint() - child.pos()
+                print(f"Drag start - hotspot: ({hotspot.x()}, {hotspot.y()})")
                 
                 # Prepare data to be serialized (as bytes)
                 # We'll use simple format: pixmap data followed by x,y coordinates
@@ -117,9 +118,11 @@ class Container(QWidget):
                 
                 # Store hotspot as a separate mime type
                 hotspot_data = QByteArray()
-                hotspot_buffer = QDataStream(hotspot_data, QIODevice.WriteOnly)
-                hotspot_buffer << hotspot.x() << hotspot.y()
+                hotspot_stream = QDataStream(hotspot_data, QIODevice.WriteOnly)
+                hotspot_stream.writeInt32(hotspot.x())
+                hotspot_stream.writeInt32(hotspot.y())
                 mime_data.setData("application/x-qtcustomhotspot", hotspot_data)
+                print(f"Serialized hotspot data size: {hotspot_data.size()} bytes")
                 
                 # Create drag object
                 drag = QDrag(self)
@@ -170,21 +173,28 @@ class Container(QWidget):
             
             # Get the hotspot data
             hotspot_data = event.mimeData().data("application/x-qtcustomhotspot")
+            print(f"Hotspot data size received: {hotspot_data.size()} bytes")
             hotspot_stream = QDataStream(hotspot_data, QIODevice.ReadOnly)
             
             # Read the x,y coordinates
-            x, y = 0, 0
-            hotspot_stream >> x >> y
+            x = hotspot_stream.readInt32()
+            y = hotspot_stream.readInt32()
             hotspot = QPoint(x, y)
+            print(f"Drop - hotspot retrieved: ({hotspot.x()}, {hotspot.y()})")
+            print(f"Drop - event position: ({event.position().toPoint().x()}, {event.position().toPoint().y()})")
             
             # Recreate the pixmap from the data
             pixmap = QPixmap()
             pixmap.loadFromData(pixmap_ba)
             
             # Create new label with the deserialized pixmap
+            # Subtract hotspot to maintain cursor position relative to image
+            drop_position = event.position().toPoint() - hotspot
+            print(f"Drop - final label position: ({drop_position.x()}, {drop_position.y()})")
+            
             new_label = QLabel(self)
             new_label.setPixmap(pixmap)
-            new_label.move(event.position().toPoint() - hotspot)
+            new_label.move(drop_position)
             new_label.show()
             new_label.setAttribute(Qt.WA_DeleteOnClose)
             
