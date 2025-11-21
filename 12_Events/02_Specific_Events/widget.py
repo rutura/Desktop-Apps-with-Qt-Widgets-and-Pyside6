@@ -39,13 +39,25 @@ class Widget(QWidget):
         print("Leave event")
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
-        if event.modifiers() & Qt.ControlModifier:
-            print(f"Control + {event.text()}")
-        if event.modifiers() & Qt.AltModifier:
-            print(f"Alt + {event.text()}")
+        print(f"Key: {event.text()} | Key Code: {event.key()}")
 
-        # Detect Shift+A
+        if event.modifiers() & Qt.ControlModifier:
+            print(f"Ctrl + Key Code: {event.key()}")
         if event.modifiers() & Qt.ShiftModifier:
-            if event.key() == Qt.Key.Key_A:
-                print("Shift + A detected")
-    
+            print(f"Shift + Key Code: {event.key()}")
+        if event.modifiers() & Qt.AltModifier:
+            print(f"Alt + Key Code: {event.key()}")
+
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        delta = event.pixelDelta() if event.hasPixelDelta() else QPoint(0, 0)
+        print(f"Wheel Event Delta: {delta}")
+        print(f"x: {event.position().x()}, y: {event.position().y()}")
+        print(f"Orientation: {event.angleDelta()}")
+
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        print(f"Widget resized, old size: {event.oldSize()}")
+        print(f"new size: {event.size()}")
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        print("Paint event triggered")
