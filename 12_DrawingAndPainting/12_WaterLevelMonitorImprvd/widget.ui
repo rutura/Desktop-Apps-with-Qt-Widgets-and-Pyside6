@@ -99,13 +99,13 @@
   <customwidget>
    <class>WaterTank</class>
    <extends>QWidget</extends>
-   <header>watertank.h</header>
+   <header>watertank</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>Indicator</class>
    <extends>QWidget</extends>
-   <header>indicator.h</header>
+   <header>indicator</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
