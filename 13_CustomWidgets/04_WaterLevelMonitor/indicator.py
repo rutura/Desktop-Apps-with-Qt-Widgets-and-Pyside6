@@ -24,7 +24,7 @@ class Indicator(QWidget):
         self.m_timer = QTimer(self)
         
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.activateDanger()
+        self.activateWarning()
         
         self.m_timer.setInterval(BLINK_INTERVAL)
         self.m_timer.timeout.connect(self.toggleLights)
@@ -52,7 +52,6 @@ class Indicator(QWidget):
         self.m_yellowActive = False
         self.m_greenActive = False
 
-
     def paintEvent(self, event):
         """Paint the indicator with its frame and lights."""
         painter = QPainter(self)
@@ -62,3 +61,30 @@ class Indicator(QWidget):
 
         # Draw the frame
         painter.drawRect(0, 0, FRAME_WIDTH, FRAME_HEIGHT)
+
+        def drawLight(yPos, isActive, activeColor):
+            """Helper function to draw a light at the specified position."""
+            if isActive and self.m_lightsOn:
+                painter.setBrush(QBrush(activeColor))
+            else:
+                painter.setBrush(QBrush(Qt.black))
+            painter.drawEllipse(LIGHT_MARGIN, yPos, LIGHT_WIDTH, LIGHT_HEIGHT)
+
+        # Draw the lights
+        if self.m_redActive:
+            drawLight(LIGHT_MARGIN, True, Qt.red)
+            drawLight(LIGHT_SPACING, False, Qt.black)
+            drawLight(LIGHT_SPACING * 2, False, Qt.black)
+        elif self.m_greenActive:
+            drawLight(LIGHT_MARGIN, False, Qt.black)
+            drawLight(LIGHT_SPACING, True, Qt.green)
+            drawLight(LIGHT_SPACING * 2, False, Qt.black)
+        elif self.m_yellowActive:
+            drawLight(LIGHT_MARGIN, False, Qt.black)
+            drawLight(LIGHT_SPACING, False, Qt.black)
+            drawLight(LIGHT_SPACING * 2, True, Qt.yellow)
+
+    def toggleLights(self):
+        """Toggle the lights on/off to create a blinking effect."""
+        self.m_lightsOn = not self.m_lightsOn
+        self.update()
